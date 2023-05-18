@@ -1,13 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
-print(tf.version)
-print(tf.config.list_physical_devices())
-print()
-print()
 from tensorflow.keras import layers
 import os
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 crossEntropy = tf.keras.losses.BinaryCrossentropy(from_logits = True)
 
@@ -37,7 +32,7 @@ def cria_gerador():
 def cria_discriminador():
     net = tf.keras.Sequential()
 
-    net.add(layers.Conv2D(filters = 64, kernel_size = (5,5), padding = 'same', input_shape = [28,28,1]))
+    net.add(layers.Conv2D(filters = 64, strides = (2,2), kernel_size = (5,5), padding = 'same', input_shape = [28,28,1]))
     net.add(layers.LeakyReLU())
     net.add(layers.Dropout(0.3))
 
@@ -52,7 +47,7 @@ def cria_discriminador():
 
 def discriminador_loss(target, pred):
     real_loss = crossEntropy(tf.ones_like(target), target)
-    fake_loss = crossEntropy(tf.ones_like(pred), pred)
+    fake_loss = crossEntropy(tf.zeros_like(pred), pred)
     total_loss = real_loss + fake_loss
     return total_loss
 
@@ -60,7 +55,8 @@ def generator_loss(fake):
     return crossEntropy(tf.ones_like(fake), fake)
 
 
-(x_train, y_train),(_,_) = tf.keras.datasets.mnist.load_data()
+#(x_train, y_train),(_,_) = tf.keras.datasets.mnist.load_data()
+(x_train, y_train),(_,_) = tf.keras.datasets.fashion_mnist.load_data()
 
 
 x_train = x_train.reshape(x_train.shape[0], 28,28,1).astype('float')
@@ -76,6 +72,8 @@ discriminador = cria_discriminador()
 geradorOpt = tf.keras.optimizers.Adam(learning_rate=0.00001)
 discriminadorOpt = tf.keras.optimizers.Adam(learning_rate=0.00001)
 
+gerador.compile(optimizer= geradorOpt, loss = generator_loss)
+discriminador.compile(optimizer= discriminadorOpt, loss = discriminador_loss)
 
 epoch = 100
 dim = 100
