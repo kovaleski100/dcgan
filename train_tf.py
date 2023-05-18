@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras import layers
+from tensorflow import keras
+from keras import layers
 import os
 
 crossEntropy = tf.keras.losses.BinaryCrossentropy(from_logits = True)
